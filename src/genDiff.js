@@ -1,30 +1,46 @@
 #!/usr/bin/env node
 
 import * as fs from 'fs';
+import _ from "lodash";
 
-const a = fs.readFile('../file1.json') {
-    console.log(file1);
+const fileData = (path) => {
+    const data = fs.readFileSync(path, 'utf-8');
+    return JSON.parse(data)
+};
+
+const difference = (obj1, obj2) => {
+    const keys = (_.union(_.keys(obj1), _.keys(obj2))).sort();
+    const result = [];
+    let combiningIndex = ''
+    for (const key of keys) {
+        if (!_.has(obj1, key)) {
+            combiningIndex = '+'
+            result.push(`${combiningIndex}${key}: ${obj2[key]}`)
+        }
+        if (!_.has(obj2, key)) {
+            combiningIndex = '-'
+            result.push(`${combiningIndex}${key}: ${obj1[key]}`)
+        }
+        if (obj1[key] === obj2[key]) {
+            combiningIndex = ' '
+            result.push(`${combiningIndex}${key}: ${obj1[key]}`)
+        }
+        if (_.has(obj1, key) && _.has(obj2, key) && obj1[key] !== obj2[key]) {
+            combiningIndex = '-'
+            result.push(`${combiningIndex}${key}: ${obj1[key]}`)
+            combiningIndex = '+'
+            result.push(`${combiningIndex}${key}: ${obj2[key]}`)
+        }
+    }
+    return `{ \n  ${result.join('\n  ')} \n}`;
 }
 
-const differences = (file1, file2) => {
+const comparison = (path1, path2) => {
+    const file1 = fileData(path1);
+    const file2 = fileData(path2);
+    return difference(file1, file2);
+};
 
-//}
-//export default  differences();
-// import * as fs from 'fs';
-// import path from 'path';
-// import compareData from './compareData.js';
-// import formatterChooser from './formatters/index.js';
-// import parse from './parsers.js';
-//
-// export default (path1, path2, format = 'stylish') => {
-//     const readFile = (pathToFile) => {
-//         const workingDir = process.cwd();
-//         const fileData = fs.readFileSync(path.resolve(workingDir, pathToFile), 'utf-8');
-//         const extension = path.extname(pathToFile).slice(1);
-//         //return parse(fileData, extension);
-//     };
-//     const data1 = readFile(path1);
-//     const data2 = readFile(path2);
-//
-//     return formatterChooser(compareData(data1, data2), format);
-// };
+console.log(fileData('./file1.json'))
+export default comparison();
+
