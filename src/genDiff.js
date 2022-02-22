@@ -35,12 +35,16 @@ const difference = (obj1, obj2) => {
     return `{ \n  ${result.join('\n  ')} \n}`;
 }
 
+const pathProcessing = (path) => {
+    const newPath = process.cwd(path);
+    return path
+}
+
 const comparison = (path1, path2) => {
     const file1 = fileData(path1);
     const file2 = fileData(path2);
     return difference(file1, file2);
 };
 
-console.log(fileData('./file1.json'))
-export default comparison();
+export default comparison;
 
